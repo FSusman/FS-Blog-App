@@ -1,92 +1,54 @@
-import { useEffect, useState } from "react";
-import Blog from "./Blog";
-import BlogCreator from "./BlogCreator";
-import blogService from "../services/blogs";
-import { addBlog, removeBlog, setBlogs } from "../reducers/blogReducer";
-import { useSelector, useDispatch } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { notify } from "../reducers/notificationReducer";
+import { removeBlog, updateBlog } from "../reducers/blogReducer";
+import blogService from "../services/blogs";
 
 const BlogView = () => {
-  const [creatorVisible, setCreatorVisible] = useState(false);
+  const id = useParams().id;
   const blogs = useSelector((state) => state.blogs);
+  const blog = blogs.find((blog) => blog.id === id);
   const user = useSelector((state) => state.user);
 
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const hideWhenVisible = { display: creatorVisible ? "none" : "" };
-  const showWhenVisible = { display: creatorVisible ? "" : "none" };
-
-  useEffect(() => {
-    getBlogs();
-  }, []);
-
-  const getBlogs = async () => {
-    await blogService.getAll().then((blogs) => {
-      dispatch(setBlogs(blogs));
-    });
-  };
-
-  const handleCreate = async (blog) => {
-    if (blog.title && blog.url) {
-      const creator = await blogService.getUser(user.username);
-      const blogToCreate = {
-        title: blog.title,
-        author: creator.username,
-        url: blog.url,
-        user: creator.id,
-      };
-      const createdBlog = await blogService.create(blogToCreate);
-      dispatch(addBlog(createdBlog));
-      dispatch(
-        notify({ message: "Blog created successfully", variant: "success" })
-      );
-      setCreatorVisible(false);
-    } else {
-      dispatch(
-        notify({ message: "Please fill the entire form", variant: "error" })
-      );
-    }
-  };
-
-  const handleLike = async (blog) => {
+  const handleLike = async () => {
     await blogService.like(blog);
+    dispatch(updateBlog(blog));
     dispatch(
       notify({
-        message: `Blog "${blog.title}" liked successfully`,
+        message: `Liked "${blog.title}" `,
         variant: "success",
       })
     );
-    getBlogs();
   };
 
-  const handleDelete = async (blog) => {
+  const handleDelete = async () => {
     if (window.confirm(`Remove blog "${blog.title}" by ${blog.author} `)) {
       await blogService.deleteBlog(blog.id);
       dispatch(removeBlog(blog.id));
+      navigate("/");
+      dispatch(
+        notify({ message: `Deleted ${blog.title}`, variant: "success" })
+      );
     }
   };
 
+  if (!blog) {
+    return <div>Blog not found</div>;
+  }
+
   return (
     <div>
-      <div>
-        <div style={hideWhenVisible}>
-          <button onClick={() => setCreatorVisible(true)}>New Blog</button>
-        </div>
-        <div style={showWhenVisible}>
-          <BlogCreator handleCreate={handleCreate} />
-          <button onClick={() => setCreatorVisible(false)}>cancel</button>
-        </div>
-      </div>
-      <div className="grid-container">
-        {blogs.map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            handleLike={handleLike}
-            handleDelete={handleDelete}
-          />
-        ))}
-      </div>
+      <h1>{blog.title}</h1>
+      <a href={blog.url}>{blog.url}</a>
+      <p>{blog.likes} likes</p>
+      <button onClick={handleLike}>like</button>
+      <p>added by {blog.author}</p>
+      {blog.author === user.name && (
+        <button onClick={handleDelete}>delete</button>
+      )}
     </div>
   );
 };

@@ -14,8 +14,14 @@ const blogSlice = createSlice({
     removeBlog(state, action) {
       return state.filter((blog) => blog.id !== action.payload);
     },
+    updateBlog(state, action) {
+      const index = state.findIndex((blog) => blog.id === action.payload.id);
+      if (index !== -1) {
+        state[index] = action.payload;
+      }
+    },
   },
 });
 
-export const { setBlogs, addBlog, removeBlog } = blogSlice.actions;
+export const { setBlogs, addBlog, removeBlog, updateBlog } = blogSlice.actions;
 export default blogSlice.reducer;

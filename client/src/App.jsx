@@ -1,20 +1,33 @@
 import { useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { notify, removeNotification } from "./reducers/notificationReducer";
 import { removeUser, setUser } from "./reducers/userReducer";
 
-import BlogView from "./components/BlogView";
+import BlogsView from "./components/BlogsView";
 import UserView from "./components/UserView";
 import Login from "./components/Login";
 import Notification from "./components/Notification";
 import UsersView from "./components/UsersView";
+import BlogView from "./components/BlogView";
+import { setBlogs } from "./reducers/blogReducer";
+import blogService from "./services/blogs";
 
 const App = () => {
   const notification = useSelector((state) => state.notification);
   const user = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    getBlogs();
+  }, []);
+
+  const getBlogs = async () => {
+    await blogService.getAll().then((blogs) => {
+      dispatch(setBlogs(blogs));
+    });
+  };
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
@@ -59,12 +72,22 @@ const App = () => {
       ) : (
         <>
           <h2>Blogs</h2>
+          <ul>
+            <li>
+              <Link to="/users">users</Link>
+            </li>
+            <li>
+              <Link to="/">blogs</Link>
+            </li>
+          </ul>
+          <p>{user.name} is logged in</p>
           <button onClick={handleLogout}>logout</button>
 
           <Routes>
-            <Route path="/" element={<BlogView />} />
+            <Route path="/" element={<BlogsView />} />
             <Route path="/users" element={<UsersView />} />
             <Route path="/users/:id" element={<UserView />} />
+            <Route path="/blogs/:id" element={<BlogView />} />
           </Routes>
         </>
       )}

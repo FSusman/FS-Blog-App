@@ -1,24 +1,12 @@
-import { useState } from "react";
+import { Link } from "react-router-dom";
 
-const Blog = ({ blog, handleLike, handleDelete }) => {
-  const [viewBlog, setViewBlog] = useState(false);
-
+const Blog = ({ blog }) => {
   return (
     <div>
       <div className="card blog">
-        <div className="blog-title">{blog.title}</div>
-        <button onClick={() => setViewBlog(!viewBlog)}>
-          {viewBlog ? "Hide" : "View"}
-        </button>
-        {viewBlog === true && (
-          <div>
-            <p className="blog-url">{blog.url}</p>
-            <p className="blog-author">{blog.author}</p>
-            <p>likes: {blog.likes}</p>
-            <button onClick={() => handleLike(blog)}>like</button>
-            <button onClick={() => handleDelete(blog)}>delete</button>
-          </div>
-        )}
+        <Link to={`/blogs/${blog.id}`} className="blog-title">
+          {blog.title}
+        </Link>
       </div>
     </div>
   );
