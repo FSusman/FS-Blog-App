@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { notify } from "../reducers/notificationReducer";
 import { removeBlog, updateBlog } from "../reducers/blogReducer";
@@ -35,6 +35,13 @@ const BlogView = () => {
     }
   };
 
+  const handleComment = async (e) => {
+    e.preventDefault();
+
+    const response = await blogService.comment(blog, e.target.comment.value);
+    console.log(response)
+  };
+
   if (!blog) {
     return <div>Blog not found</div>;
   }
@@ -42,13 +49,21 @@ const BlogView = () => {
   return (
     <div>
       <h1>{blog.title}</h1>
-      <a href={blog.url}>{blog.url}</a>
+      <Link to="#">{blog.url}</Link>
       <p>{blog.likes} likes</p>
       <button onClick={handleLike}>like</button>
       <p>added by {blog.author}</p>
       {blog.author === user.name && (
         <button onClick={handleDelete}>delete</button>
       )}
+      <form onSubmit={(e) => handleComment(e)}>
+        <input type="text" name="comment" />
+        <button type="submit">comment</button>
+      </form>
+      <ul>
+        {blog.comments.length > 0 &&
+          blog.comments.map((comment) => <li>{comment}</li>)}
+      </ul>
     </div>
   );
 };

@@ -30,7 +30,23 @@ const like = async (blog) => {
     author: blog.author,
     title: blog.title,
     url: blog.url,
+    comments: blog.comments,
   };
+
+  const response = await axios.put(`${baseBlogUrl}/${blog.id}`, blogToUpdate);
+  return response.data;
+};
+const comment = async (blog, comment) => {
+  
+  const blogToUpdate = {
+    user: blog.user,
+    likes: blog.likes,
+    author: blog.author,
+    title: blog.title,
+    url: blog.url,
+    comments: blog.comments.concat(comment),
+  };
+
 
   const response = await axios.put(`${baseBlogUrl}/${blog.id}`, blogToUpdate);
   return response.data;
@@ -51,4 +67,4 @@ const getUsers = async () => {
   return response;
 };
 
-export default { getAll, getUser, create, like, deleteBlog, getUsers };
+export default { getAll, getUser, create, like, deleteBlog, getUsers, comment };

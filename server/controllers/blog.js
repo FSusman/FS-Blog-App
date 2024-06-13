@@ -34,6 +34,13 @@ blogRouter.post("/", async (request, response) => {
 blogRouter.delete("/:id", async (request, response) => {
   const blog = await Blog.findById(request.params.id);
 
+  const users = await User.find({});
+
+  const user = users.find((user) => user.blogs.includes(request.params.id));
+  const indexOfBlog = user.blogs.indexOf(id);
+  user.blogs.splce(indexOfBlog, 1);
+  await user.save();
+
   const deletedBlog = await Blog.deleteOne({ _id: request.params.id });
 
   if (deletedBlog) {
@@ -55,17 +62,21 @@ blogRouter.put("/:id", async (request, response) => {
     response.status(404).json({ error: "Couldn't find such a blog" });
   }
 
+  console.log("Given blog", body);
+
   const blogToUpdate = {
     user: blog.user,
     likes: body.likes,
     author: body.author,
     url: body.url,
     title: body.title,
+    comments: body.comments,
   };
 
   const options = { new: true };
 
   const updatedBlog = await Blog.findByIdAndUpdate(id, blogToUpdate, options);
+  console.log("Updated blog", updatedBlog);
 
   response.status(200).json({
     message: `Updated the likes of blog with id ${id} to ${updatedBlog.likes} likes`,
