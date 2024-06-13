@@ -3,6 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { notify } from "../reducers/notificationReducer";
 import { removeBlog, updateBlog } from "../reducers/blogReducer";
 import blogService from "../services/blogs";
+import { GhostIcon, HeartIcon, TrashIcon } from "lucide-react";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 
 const BlogView = () => {
   const id = useParams().id;
@@ -38,8 +41,8 @@ const BlogView = () => {
   const handleComment = async (e) => {
     e.preventDefault();
 
-    const response = await blogService.comment(blog, e.target.comment.value);
-    console.log(response)
+    await blogService.comment(blog, e.target.comment.value);
+    window.location.reload()
   };
 
   if (!blog) {
@@ -48,22 +51,35 @@ const BlogView = () => {
 
   return (
     <div>
-      <h1>{blog.title}</h1>
-      <Link to="#">{blog.url}</Link>
-      <p>{blog.likes} likes</p>
-      <button onClick={handleLike}>like</button>
-      <p>added by {blog.author}</p>
+      <h1 className="font-semibold text-2xl">{blog.title}</h1>
+      <Link to="#" className="font-medium">
+        {blog.url}
+      </Link>
+      <p className=" text-slate-600">{blog.likes} likes</p>
+      <p className=" text-slate-600">added by {blog.author}</p>
       {blog.author === user.name && (
-        <button onClick={handleDelete}>delete</button>
+        <Button onClick={handleDelete} variant="outline">
+          <TrashIcon />
+        </Button>
       )}
-      <form onSubmit={(e) => handleComment(e)}>
-        <input type="text" name="comment" />
-        <button type="submit">comment</button>
-      </form>
-      <ul>
-        {blog.comments.length > 0 &&
-          blog.comments.map((comment) => <li>{comment}</li>)}
+      <Button
+        variant="outline"
+        className="ml-2 text-red-600 border-red-600 hover:text-red-400"
+        onClick={handleLike}
+      >
+        <HeartIcon />
+      </Button>
+      <ul className="mt-4">
+        {blog.comments.length > 0 ? (
+          blog.comments.map((comment) => <li>{comment}</li>)
+        ) : (
+          <p className="flex text-slate-600">No comments yet </p>
+        )}
       </ul>
+      <form onSubmit={(e) => handleComment(e)} className="flex w-1/2 mt-4">
+        <Input type="text" name="comment" />
+        <Button type="submit">comment</Button>
+      </form>
     </div>
   );
 };

@@ -62,7 +62,6 @@ blogRouter.put("/:id", async (request, response) => {
     response.status(404).json({ error: "Couldn't find such a blog" });
   }
 
-  console.log("Given blog", body);
 
   const blogToUpdate = {
     user: blog.user,
@@ -76,7 +75,6 @@ blogRouter.put("/:id", async (request, response) => {
   const options = { new: true };
 
   const updatedBlog = await Blog.findByIdAndUpdate(id, blogToUpdate, options);
-  console.log("Updated blog", updatedBlog);
 
   response.status(200).json({
     message: `Updated the likes of blog with id ${id} to ${updatedBlog.likes} likes`,

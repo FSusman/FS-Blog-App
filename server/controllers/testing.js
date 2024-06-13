@@ -7,7 +7,6 @@ router.post("/reset", async (request, response) => {
   await User.deleteMany({});
 
   response.status(200).json({ message: "reset the database successfully." });
-  console.log("reset the database");
 });
 
 module.exports = router;
