@@ -1,10 +1,19 @@
 import { useEffect, useState } from "react";
-import Blog from "./Blog";
 import BlogCreator from "./BlogCreator";
 import blogService from "../services/blogs";
 import { addBlog, setBlogs } from "../reducers/blogReducer";
 import { useSelector, useDispatch } from "react-redux";
 import { notify } from "../reducers/notificationReducer";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Link } from "react-router-dom";
 
 const BlogsView = () => {
   const [creatorVisible, setCreatorVisible] = useState(false);
@@ -15,7 +24,6 @@ const BlogsView = () => {
 
   const hideWhenVisible = { display: creatorVisible ? "none" : "" };
   const showWhenVisible = { display: creatorVisible ? "" : "none" };
-
 
   const handleCreate = async (blog) => {
     if (blog.title && blog.url) {
@@ -39,25 +47,42 @@ const BlogsView = () => {
     }
   };
 
-
   return (
     <div>
       <div>
         <div style={hideWhenVisible}>
-          <button onClick={() => setCreatorVisible(true)}>New Blog</button>
+          <Button onClick={() => setCreatorVisible(true)} variant={"outline"}>
+            New Blog
+          </Button>
         </div>
         <div style={showWhenVisible}>
           <BlogCreator handleCreate={handleCreate} />
-          <button onClick={() => setCreatorVisible(false)}>cancel</button>
+          <Button onClick={() => setCreatorVisible(false)}>cancel</Button>
         </div>
       </div>
       <div className="grid-container">
-        {blogs.map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-          />
-        ))}
+          <Table className="w-1/2 border mt-4">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Sr.</TableHead>
+                <TableHead>Title</TableHead>
+                <TableHead>Likes</TableHead>
+                <TableHead>Comments</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+        {blogs.map((blog, id) => (
+                <TableRow key={blog.id}>
+                  <TableCell>{id + 1}</TableCell>
+                  <TableCell className="font-medium">
+                    <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+                  </TableCell>
+                  <TableCell>{blog.likes}</TableCell>
+                  <TableCell>{blog.comments.length}</TableCell>
+                </TableRow>
+            ))}
+            </TableBody>
+          </Table>
       </div>
     </div>
   );

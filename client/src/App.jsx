@@ -7,11 +7,12 @@ import { removeUser, setUser } from "./reducers/userReducer";
 import BlogsView from "./components/BlogsView";
 import UserView from "./components/UserView";
 import Login from "./components/Login";
-import Notification from "./components/Notification";
 import UsersView from "./components/UsersView";
 import BlogView from "./components/BlogView";
 import { setBlogs } from "./reducers/blogReducer";
 import blogService from "./services/blogs";
+import toast from "react-hot-toast";
+import { Button } from "./components/ui/button";
 
 const App = () => {
   const notification = useSelector((state) => state.notification);
@@ -37,6 +38,9 @@ const App = () => {
   }, []);
 
   useEffect(() => {
+    if (notification) {
+      notification.variant === 'success' ? toast.success(notification.message) : toast.error(notification.message)
+    }
     setTimeout(() => {
       if (notification === null) {
         return;
@@ -58,30 +62,29 @@ const App = () => {
   };
 
   return (
-    <div>
-      {notification && (
-        <Notification
-          message={notification.message}
-          variant={notification.variant}
-        />
-      )}
+    <div className="p-4">
       {user === null ? (
         <div>
           <Login />
         </div>
       ) : (
         <>
-          <h2>Blogs</h2>
-          <ul>
-            <li>
-              <Link to="/users">users</Link>
-            </li>
-            <li>
-              <Link to="/">blogs</Link>
-            </li>
-          </ul>
-          <p>{user.name} is logged in</p>
-          <button onClick={handleLogout}>logout</button>
+          <div className="flex justify-between items-center">
+            <h2 className="text-4xl font-semibold">Blog App</h2>
+            <ul className="flex items-center space-x-2 text-lg">
+              <Button variant={'ghost'} className='text-lg underline hover:no-underline duration-300' >
+                <Link to="/users">Users</Link>
+              </Button>
+              <Button variant={'ghost'} className='text-lg underline hover:no-underline duration-300'>
+                <Link to="/">Blogs</Link>
+              </Button>
+
+            </ul>
+            <Button onClick={handleLogout}>Logout</Button>
+          </div>
+          <div className="flex items-center space-x-2">
+            <p className="italic text-lg">"{user.name}" is logged in</p>
+          </div>
 
           <Routes>
             <Route path="/" element={<BlogsView />} />
